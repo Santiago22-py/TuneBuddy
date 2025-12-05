@@ -10,7 +10,6 @@ export default function Home() {
 
       {/* Main content*/}
       <main className="flex-1">
-
         {/* Hero Section div */}
         {/* I divided the hero section int two, the text and button on the left and the image on the right */}
         <div className="bg-gradient-to-br from-black via-slate-900 to-[#1f2933]">
@@ -73,8 +72,8 @@ export default function Home() {
                 <div>
                   <h3 className="text-2xl font-bold mb-1">Search</h3>
                   <p className="text-base md:text-lg leading-snug text-slate-700">
-                    Songs by title or artist using our built-in music
-                    search powered by a public API.
+                    Songs by title or artist using our built-in music search
+                    powered by a public API.
                   </p>
                 </div>
               </div>
@@ -97,7 +96,8 @@ export default function Home() {
                 <div>
                   <h3 className="text-2xl font-bold mb-1">See your stats</h3>
                   <p className="text-base md:text-lg leading-snug text-slate-700">
-                    Discover your top artists and albums, and check out what you listen the most.
+                    Discover your top artists and albums, and check out what you
+                    listen the most.
                   </p>
                 </div>
               </div>
