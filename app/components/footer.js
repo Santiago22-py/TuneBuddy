@@ -4,7 +4,7 @@ export default function Footer() {
         return new Date().getFullYear();
     }
   return (
-    <footer className="bg-gray-800 p-4 text-white mt-auto">
+    <footer className="bg-black p-4 text-white mt-auto">
       <div className="container mx-auto text-center">
         &copy; {getCurrentYear()} TuneBuddy — Built with Next.js & Firebase
       </div>
