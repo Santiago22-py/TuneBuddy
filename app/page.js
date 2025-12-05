@@ -32,7 +32,7 @@ export default function Home() {
               {/* Buttons */}
               <div className="flex flex-wrap items-center gap-4">
                 <Link
-                  href="/login"
+                  href="/page-login"
                   className="px-6 py-3 bg-[#FA8128] hover:bg-[#ff9b47] text-black font-semibold rounded-lg shadow-lg shadow-[#FA8128]/40 transition duration-300">
                   Start Tracking
                 </Link>
@@ -112,7 +112,7 @@ export default function Home() {
                 Create your free account and start building your music memory.
               </p>
               <Link
-                href="/signup"
+                href="/page-login"
                 className="inline-flex items-center px-6 py-3 bg-black text-white font-semibold rounded-lg shadow-lg hover:bg-slate-900 transition duration-300">
                 Get Started
                 <span className="ml-2">🎧</span>
