@@ -1,0 +1,59 @@
+"use client";
+
+import { useContext, createContext, useState, useEffect } from "react";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
+
+const AuthContext = createContext();
+
+export const AuthContextProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Email sign up function
+  const emailSignUp = async (email, password, displayName) => {
+    // Create user with email and password
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Update firebase user profile with display name
+    await updateProfile(userCredential.user, { displayName });
+
+    return userCredential;
+  };
+
+  // Email sign in function
+  const emailSignIn = (email, password) => {
+    // Sign in user with email and password
+    return signInWithEmailAndPassword(auth, email, password); //Look at how simple this is, praised be Firebase
+  }
+
+  // Reused function from week 9 assignment ;)
+  const firebaseSignOut = () => {
+    return signOut(auth);
+  };
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+      console.log("Auth state changed. Current user:", currentUser);
+    });
+    return () => unsubscribe();
+  }, [user]);
+
+  return (
+    <AuthContext.Provider
+      value={{ user, loading, emailSignUp, emailSignIn, firebaseSignOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useUserAuth = () => {
+  return useContext(AuthContext);
+};
