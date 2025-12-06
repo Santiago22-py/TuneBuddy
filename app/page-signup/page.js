@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUserAuth } from "../contexts/AuthContext.js";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -9,18 +9,25 @@ import Footer from "../components/footer";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { user,emailSignUp } = useUserAuth();
+  const { user, emailSignUp, loading } = useUserAuth();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.push("/page-dashboard");
+    }
+  }, [loading, user, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setSubmitting(true);
 
     try {
       await emailSignUp(email, password, username);
@@ -36,27 +43,27 @@ export default function SignUpPage() {
       console.error("Sign up error:", err);
     }
 
-    setLoading(false);
+    setSubmitting(false);
   };
 
-  // If user is logged in, don't render the dashboard
-  // Redirect them to dashboard instead
-  if (user) {
-    router.push("/page-dashboard");
-    return null;
+  //If still loading, display loading message
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-black text-white">
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-[#1a1a1a] to-[#0d0d0d]">
-      {/* Main content*/}
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-10 w-full max-w-md">
           <h1 className="text-4xl font-maven font-bold mb-6 text-center text-[#FA8128]">
             Create an account
           </h1>
 
-          {/* Dog vibing picture */}
-          <div className="w-32 h-32 mx-auto mb-6 border-2 border-black rounded-full overflow-hidden border-2 border-black shadow-[0_0_30px_rgba(250,129,40,0.7)]"> {/* Added glowing border */}
+          <div className="w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-2 border-black shadow-[0_0_30px_rgba(250,129,40,0.7)]">
             <Image
               src="/assets/image/dog-headphones.jpg"
               alt="Dog with headphones"
@@ -120,9 +127,9 @@ export default function SignUpPage() {
             {/* SUBMIT */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={submitting}
               className="w-full py-3 rounded-lg font-bold bg-[#FA8128] hover:bg-[#ff9b47] text-black shadow-lg shadow-[#FA8128]/40 transition active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed">
-              {loading ? "Creating account..." : "Sign Up"}
+              {submitting ? "Creating account..." : "Sign Up"}
             </button>
           </form>
 

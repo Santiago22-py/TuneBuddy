@@ -9,6 +9,7 @@ import {
   updateProfile,
 } from "firebase/auth";
 import { auth } from "../utils/firebase";
+import { createUserProfile } from "../services/user-service.js";
 
 const AuthContext = createContext();
 
@@ -22,6 +23,8 @@ export const AuthContextProvider = ({ children }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     // Update firebase user profile with display name
     await updateProfile(userCredential.user, { displayName });
+    // Create user profile in Firestore
+    await createUserProfile(userCredential.user, displayName);
 
     return userCredential;
   };
