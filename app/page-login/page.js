@@ -9,7 +9,7 @@ import Footer from "../components/footer";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { emailSignIn } = useUserAuth(); // from your updated AuthContext
+  const { user, emailSignIn } = useUserAuth(); // from your updated AuthContext
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,6 +41,13 @@ export default function LoginPage() {
 
     setLoading(false);
   };
+
+  // If user is logged in, don't render the dashboard
+  // Redirect them to dashboard instead
+  if (user) {
+    router.push("/page-dashboard");
+    return null;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-[#1a1a1a] to-[#0d0d0d]">
