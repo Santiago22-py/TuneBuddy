@@ -56,7 +56,7 @@ export default function Home() {
         </div>
 
         {/* Content div */}
-        <div className="bg-[#ED820E] bg-gradient-to-b from-[#ED820E] to-[#c06710] text-black py-16 px-6">
+        <div className="bg-[#ED820E] bg-gradient-to-b from-[#ED820E] to-[#c06710] text-black py-35 px-6">
           <div className="max-w-7xl mx-auto space-y-10">
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-maven font-bold">
