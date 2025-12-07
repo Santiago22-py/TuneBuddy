@@ -64,8 +64,8 @@ export default function LoginPage() {
             <Image
               src="/assets/image/cat-headphones.jpg"
               alt="Dog with headphones"
-              width={128}
-              height={128}
+              width={256}
+              height={256}
               className="w-full h-full object-cover"
             />
           </div>
