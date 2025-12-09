@@ -1,5 +1,6 @@
 import {db} from '../utils/firebase.js';
 import { collection, addDoc, getDocs, serverTimestamp, doc} from 'firebase/firestore';
+import { slugify } from '../utils/slugify.js'; //Import slugify function
 
 //Function to get the lists of a user
 export async function getLists(userId) {
@@ -19,6 +20,8 @@ export async function getLists(userId) {
 
 //Function to create a new list for a user
 export async function createList(userId, name, description='') {
+    const slug = slugify(name); //Generate slug from name
+
     const listsRef = collection(db, 'users', userId, 'lists');
 
     //Add a new document to the lists collection
@@ -28,6 +31,6 @@ export async function createList(userId, name, description='') {
         createdAt: serverTimestamp(),
     });
 
-    //Return the ID of the newly created document
-    return docRef.id;
+    //Return the ID of the newly created document and the slug
+    return {    id: docRef.id, name, description, slug };
 }   
