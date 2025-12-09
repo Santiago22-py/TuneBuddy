@@ -9,6 +9,7 @@ import { useUserAuth } from "../../contexts/AuthContext";
 import { getListBySlug } from "../../services/list-service.js";
 import { searchSongs } from "@/app/services/song-search";
 import { addSongToList } from "@/app/services/song-service";
+import { deleteSongFromList } from "@/app/services/song-service";
 import { getAllSongs } from "@/app/services/song-service";
 
 //Compenent imports
@@ -179,6 +180,17 @@ export default function ListPage({ params }) {
       setAddSongFeedback(`Failed to add "${song.title}" to the list.`);
     }
   };
+
+  //Function to handle removing a song from the list
+  const handleDeleteSong = async (songId) => {
+    try {
+      await deleteSongFromList(user.uid, list.id, songId);
+      await refreshSongs();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
 
   //Function to handle playing preview
   const handlePlayPreview = (song) => {
@@ -360,6 +372,19 @@ export default function ListPage({ params }) {
                         No preview available for this track.
                       </p>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSong(song.id)}
+                      className="self-start ml-auto px-4 py-2 rounded-full bg-[#FA8128] hover:bg-[#ff9b47] text-black text-sm font-semibold transition flex items-center gap-2">
+                      <img
+                        src="/assets/svg/trash.svg"
+                        alt="Delete song"
+                        width={16}
+                        height={16}
+                        className="opacity-90"
+                      />
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}

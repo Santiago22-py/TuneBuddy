@@ -5,6 +5,7 @@ import {
   serverTimestamp,
   collection,
   getDocs,
+  deleteDoc,
 } from "firebase/firestore";
 
 //Function to add a song to the user's list
@@ -47,3 +48,18 @@ export async function getAllSongs(userId, listId) {
 
   return songs;
 }
+
+//Function to delete a song from a list
+  export async function deleteSongFromList(userId, listId, songId) {
+    const songRef = doc(
+      db,
+      "users",
+      userId,
+      "lists",
+      listId,
+      "songs",
+      String(songId)
+    );
+
+    await deleteDoc(songRef);
+  }
