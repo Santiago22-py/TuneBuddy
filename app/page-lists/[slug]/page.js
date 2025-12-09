@@ -168,6 +168,11 @@ export default function ListPage({ params }) {
       setAddSongFeedback(null);
       await addSongToList(user.uid, list.id, song);
       setAddSongFeedback(`Added "${song.title}" to the list!`);
+
+      //Clear search input and results
+      setQuery("");
+      setSearchResults([]);
+
       await refreshSongs();
     } catch (err) {
       console.error(err);
