@@ -5,6 +5,7 @@ import { useUserAuth } from "../contexts/AuthContext.js";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import Navbar from "../components/navbar.js";
 import Footer from "../components/footer";
 
 export default function SignUpPage() {
@@ -57,6 +58,7 @@ export default function SignUpPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-black via-[#1a1a1a] to-[#0d0d0d]">
+      <Navbar />
       <main className="flex-1 flex items-center justify-center px-6">
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-10 w-full max-w-md">
           <h1 className="text-4xl font-maven font-bold mb-6 text-center text-[#FA8128]">
