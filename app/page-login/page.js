@@ -27,12 +27,8 @@ export default function LoginPage() {
     } catch (err) {
       if (err.code === "auth/invalid-credential") {
         setError("Invalid email or password.");
-      } else if (err.code === "auth/invalid-email") {
-        setError("Invalid email address.");
       } else if (err.code === "auth/user-not-found") {
         setError("No account found with that email.");
-      } else if (err.code === "auth/wrong-password") {
-        setError("Incorrect password.");
       } else {
         setError(err.message);
       }
