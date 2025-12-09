@@ -1,8 +1,6 @@
 "use client";
 
-
 export default function SongResultCard({ song, onAdd, onPreview, isPlaying }) {
-
   return (
     <div className="flex gap-4 bg-black/40 border border-white/10 rounded-xl p-3 hover:bg-black/60 transition">
       <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg">

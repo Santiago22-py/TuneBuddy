@@ -191,7 +191,6 @@ export default function ListPage({ params }) {
     }
   };
 
-
   //Function to handle playing preview
   const handlePlayPreview = (song) => {
     const audio = audioRef.current; //Get audio element
