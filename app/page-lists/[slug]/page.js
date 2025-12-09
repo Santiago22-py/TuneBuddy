@@ -9,6 +9,7 @@ import { useUserAuth } from "../../contexts/AuthContext";
 import { getListBySlug } from "../../services/list-service.js";
 import { searchSongs } from "@/app/services/song-search";
 import { addSongToList } from "@/app/services/song-service";
+import { getAllSongs } from "@/app/services/song-service";
 
 //Compenent imports
 import Navbar from "../../components/navbar";
@@ -37,6 +38,10 @@ export default function ListPage({ params }) {
 
   //Feedback for adding song
   const [addSongFeedback, setAddSongFeedback] = useState(null);
+
+  //States for songs in the list
+  const [songs, setSongs] = useState([]);
+  const [songsLoading, setSongsLoading] = useState(true);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -70,6 +75,25 @@ export default function ListPage({ params }) {
 
     load();
   }, [user, slug]);
+
+  //Load songs in the list
+  useEffect(() => {
+    if (!user || !list) return; //If user or list not available yet, do nothing
+
+    //Function to load songs
+    const loadSongs = async () => {
+      try {
+        setSongsLoading(true);
+        const data = await getAllSongs(user.uid, list.id);
+        setSongs(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setSongsLoading(false);
+      }
+    };
+    loadSongs();
+  }, [user, list]);
 
   // If loading, show a loading message
   if (loading || loadingList) {
@@ -154,7 +178,7 @@ export default function ListPage({ params }) {
           </div>
         </header>
 
-        {/* Search & add section */}
+        {/* Search & add div */}
         <div className="bg-black/50 rounded-2xl border border-white/10 p-6 shadow-lg shadow-[#FA8128]/10 mb-8">
           {/* HEADER */}
           <div className="flex items-center justify-between mb-3">
@@ -176,7 +200,7 @@ export default function ListPage({ params }) {
           <p className="text-sm text-slate-300 mb-4">
             Search for the songs{" "}
             <span className="text-[#FA8128] font-semibold">YOU</span> want and
-            add them to 
+            add them to
             <span className="text-[#FA8128] font-semibold"> {list.name}</span>.
           </p>
 
@@ -239,14 +263,46 @@ export default function ListPage({ params }) {
           )}
         </div>
 
-        {/* Placeholder: for songs */}
-        <div className="bg-black/40 rounded-2xl border border-white/10 p-6">
-          <h2 className="text-lg md:text-xl font-semibold mb-2">
-            Songs in this list
+        {/* Display songs in the list */}
+        <div className="bg-black/40 rounded-2xl border border-white/10 p-6 mt-10">
+          <h2 className="text-lg md:text-xl font-semibold mb-4">
+            Check out these <span className="text-[#FA8128]">Bangers</span> !
           </h2>
-          <p className="text-sm text-slate-400">
-            Once we wire up list songs, they’ll show up here.
-          </p>
+
+          {/* if soings are still loading, show loading message */}
+          {songsLoading && (
+            <p className="text-slate-400 animate-pulse">Loading songs...</p>
+          )}
+
+          {/* if no songs in the list, show message */}
+          {!songsLoading && songs.length === 0 && (
+            <p className="text-slate-500">
+              This list is empty. Search above to add some songs!
+            </p>
+          )}
+
+          {/* Otherwise, show the songs */}
+          {!songsLoading && songs.length > 0 && (
+            <div className="space-y-4">
+              {songs.map((song) => (
+                <div
+                  key={song.id}
+                  className="flex items-center gap-4 p-3 rounded-lg bg-black/60 border border-white/10 hover:border-[#FA8128] transition">
+                  <img
+                    src={song.artwork}
+                    alt={song.title}
+                    className="w-40 h-40 rounded-md shadow"
+                  />
+                  <div className="flex-1">
+                    <h3 className="text-white font-semibold text-2xl">{song.title}</h3>
+                    <p className="text-slate-400 text-md">
+                      {song.artist} • {song.album}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
 
