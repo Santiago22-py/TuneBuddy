@@ -263,11 +263,13 @@ export default function ListPage({ params }) {
           )}
         </div>
 
+
         {/* Display songs in the list */}
-        <div className="bg-black/40 rounded-2xl border border-white/10 p-6 mt-10">
-          <h2 className="text-lg md:text-xl font-semibold mb-4">
-            Check out these <span className="text-[#FA8128]">Bangers</span> !
+        <h2 className="text-4xl font-semibold mb-1 mt-10">
+            Check out these <span className="text-[#FA8128]">Bangers</span>!
           </h2>
+        <div className="bg-black/40 rounded-2xl border border-white/10 p-6 ">
+          
 
           {/* if soings are still loading, show loading message */}
           {songsLoading && (
