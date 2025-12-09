@@ -47,6 +47,28 @@ export default function Navbar() {
     );
   }
 
+  //If profile is still loading, show loading text
+  if (loading) {
+    return (
+      <nav className="bg-black p-4 mt-2 mb-2 border-b border-white/10">
+        <div className="w-full flex items-center justify-between px-6">
+          {/* Logo */}
+          <Link href="/" className="text-xl font-bold">
+            <Image
+              src="/assets/svg/logo-text-white.svg"
+              alt="Tune Buddy Logo"
+              width={150}
+              height={40}
+            />
+          </Link>
+
+          {/* RIGHT SIDE LOADING TEXT */}
+          <div className="text-white font-medium">Loading...</div>
+        </div>
+      </nav>
+    );
+  }
+
   return (
     <nav className="bg-black p-4 mt-2 mb-2 border-b border-white/10">
       <div className="w-full flex items-center justify-between px-6">
