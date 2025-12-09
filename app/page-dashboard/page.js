@@ -54,6 +54,7 @@ export default function DashboardPage() {
 
   const handleCreateList = async (e) => {
     e.preventDefault();
+    // Prevent creating list with empty name
     if (!newListName.trim()) return;
 
     try {
