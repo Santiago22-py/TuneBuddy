@@ -50,6 +50,8 @@ export default function ListPage({ params }) {
     }
   }, [loading, user, router]);
 
+ 
+
   // Load list data
   useEffect(() => {
     if (!user || !slug) return; //If user or slug not available yet, do nothing
@@ -119,6 +121,20 @@ export default function ListPage({ params }) {
   //                   //
   ///////////////////////
 
+  // Helper function to refresh songs
+  const refreshSongs = async () => {
+  if (!user || !list) return;
+  try {
+    setSongsLoading(true);
+    const data = await getAllSongs(user.uid, list.id);
+    setSongs(data);
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setSongsLoading(false);
+  }
+};
+
   //Function to handle searching
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -150,6 +166,7 @@ export default function ListPage({ params }) {
       setAddSongFeedback(null);
       await addSongToList(user.uid, list.id, song);
       setAddSongFeedback(`Added "${song.title}" to the list!`);
+      await refreshSongs();
     } catch (err) {
       console.error(err);
       setAddSongFeedback(`Failed to add "${song.title}" to the list.`);
