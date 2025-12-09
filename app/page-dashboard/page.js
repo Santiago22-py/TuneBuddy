@@ -190,7 +190,7 @@ export default function DashboardPage() {
                   return (
                     <button
                       key={list.id}
-                      onClick={() => router.push(`/lists/${list.id}`)}
+                      onClick={() => router.push(`/page-lists/${list.slug}`)}
                       className="relative overflow-hidden group w-full rounded-2xl bg-gradient-to-br from-[#FA8128]/25 via-black to-[#111827] border border-white/10 p-5 text-left shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-[#FA8128]/70 transition">
                       {/* Vinyl-ish accent circle */}
                       <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full border border-[#FA8128]/40 bg-[#FA8128]/10 opacity-40 group-hover:rotate-12 group-hover:opacity-70 transition" />
