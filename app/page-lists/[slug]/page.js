@@ -239,7 +239,7 @@ export default function ListPage({ params }) {
           )}
         </div>
 
-        {/* Placeholder: later show songs already in this list */}
+        {/* Placeholder: for songs */}
         <div className="bg-black/40 rounded-2xl border border-white/10 p-6">
           <h2 className="text-lg md:text-xl font-semibold mb-2">
             Songs in this list
