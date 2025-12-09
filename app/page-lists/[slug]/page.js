@@ -371,6 +371,8 @@ export default function ListPage({ params }) {
                         No preview available for this track.
                       </p>
                     )}
+
+                    {/* Delete button */}
                     <button
                       type="button"
                       onClick={() => handleDeleteSong(song.id)}
@@ -380,7 +382,6 @@ export default function ListPage({ params }) {
                         alt="Delete song"
                         width={16}
                         height={16}
-                        className="opacity-90"
                       />
                       Delete
                     </button>
