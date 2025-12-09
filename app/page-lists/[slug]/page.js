@@ -1,7 +1,7 @@
 "use client";
 
 //React and Next imports
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUserAuth } from "../../contexts/AuthContext";
 
@@ -43,14 +43,16 @@ export default function ListPage({ params }) {
   const [songs, setSongs] = useState([]);
   const [songsLoading, setSongsLoading] = useState(true);
 
+  //States for the audio Preview
+  const [currentPreviewId, setCurrentPreviewId] = useState(null);
+  const audioRef = useRef(null);
+
   // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
       router.push("/page-login");
     }
   }, [loading, user, router]);
-
- 
 
   // Load list data
   useEffect(() => {
@@ -123,17 +125,17 @@ export default function ListPage({ params }) {
 
   // Helper function to refresh songs
   const refreshSongs = async () => {
-  if (!user || !list) return;
-  try {
-    setSongsLoading(true);
-    const data = await getAllSongs(user.uid, list.id);
-    setSongs(data);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setSongsLoading(false);
-  }
-};
+    if (!user || !list) return;
+    try {
+      setSongsLoading(true);
+      const data = await getAllSongs(user.uid, list.id);
+      setSongs(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSongsLoading(false);
+    }
+  };
 
   //Function to handle searching
   const handleSearch = async (e) => {
@@ -173,6 +175,24 @@ export default function ListPage({ params }) {
     }
   };
 
+  //Function to handle playing preview
+  const handlePlayPreview = (song) => {
+    const audio = audioRef.current; //Get audio element
+    if (!audio) return;
+
+    if (currentPreviewId === song.id) {
+      //If the same song is clicked, pause it
+      audio.pause();
+      setCurrentPreviewId(null);
+      return;
+    }
+
+    //Othwerwise, play the new song
+    audio.src = song.previewUrl;
+    audio.play();
+    setCurrentPreviewId(song.id);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-black via-[#050509] to-black">
       <Navbar />
@@ -194,7 +214,6 @@ export default function ListPage({ params }) {
             )}
           </div>
         </header>
-
         {/* Search & add div */}
         <div className="bg-black/50 rounded-2xl border border-white/10 p-6 shadow-lg shadow-[#FA8128]/10 mb-8">
           {/* HEADER */}
@@ -279,15 +298,13 @@ export default function ListPage({ params }) {
             </div>
           )}
         </div>
-
-
         {/* Display songs in the list */}
+        <audio ref={audioRef} className="hidden" />{" "}
+        {/* Hidden audio element for previews */}
         <h2 className="text-4xl font-semibold mb-1 mt-10">
-            Check out these <span className="text-[#FA8128]">Bangers</span>!
-          </h2>
+          Check out these <span className="text-[#FA8128]">Bangers</span>!
+        </h2>
         <div className="bg-black/40 rounded-2xl border border-white/10 p-6 ">
-          
-
           {/* if soings are still loading, show loading message */}
           {songsLoading && (
             <p className="text-slate-400 animate-pulse">Loading songs...</p>
@@ -313,10 +330,29 @@ export default function ListPage({ params }) {
                     className="w-40 h-40 rounded-md shadow"
                   />
                   <div className="flex-1">
-                    <h3 className="text-white font-semibold text-2xl">{song.title}</h3>
+                    <h3 className="text-white font-semibold text-2xl">
+                      {song.title}
+                    </h3>
                     <p className="text-slate-400 text-md">
                       {song.artist} • {song.album}
                     </p>
+                    {/* Preview button */}
+                    {song.previewUrl && (
+                      <button
+                        type="button"
+                        onClick={() => handlePlayPreview(song)}
+                        className="mt-3 inline-flex items-center px-4 py-2 rounded-full bg-[#FA8128] text-black text-sm font-semibold hover:bg-[#ff9b47] transition">
+                        {currentPreviewId === song.id
+                          ? "Pause preview"
+                          : "Play preview"}
+                      </button>
+                    )}
+
+                    {!song.previewUrl && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        No preview available for this track.
+                      </p>
+                    )}
                   </div>
                 </div>
               ))}
