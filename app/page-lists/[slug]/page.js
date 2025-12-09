@@ -290,6 +290,8 @@ export default function ListPage({ params }) {
                       key={song.id}
                       song={song}
                       onAdd={handleAddSong}
+                      onPreview={handlePlayPreview}
+                      isPlaying={currentPreviewId === song.id}
                     />
                   ))}
                 </div>
