@@ -3,18 +3,38 @@
 import { useState, useEffect } from "react";
 import { useUserAuth } from "../contexts/AuthContext";
 import { useRouter } from "next/navigation";
+
+// Components
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
+
+// Services
 import { getLists, createList } from "../services/list-service.js";
+import { getUserStats } from "../services/stats-service.js";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading } = useUserAuth();
 
+  ////////////////////////////////////////////////
+  //                                            //
+  //              STATES                        //
+  //                                            //
+  ////////////////////////////////////////////////
+
   // List helper states
   const [lists, setLists] = useState([]);
   const [listsLoading, setListsLoading] = useState(true);
   const [listsError, setListsError] = useState(null);
+
+  //Stats helper states
+  const [stats, setStats] = useState({
+    totalSongs: 0,
+    topArtists: [],
+    topAlbums: [],
+  });
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState(null);
 
   // New list helper states
   const [newListName, setNewListName] = useState("");
@@ -23,6 +43,12 @@ export default function DashboardPage() {
 
   // Control showing/hiding create list panel
   const [showCreate, setShowCreate] = useState(false);
+
+  ////////////////////////////////////////////////
+  //                                            //
+  //              USE EFFECTS                   //
+  //                                            //
+  ////////////////////////////////////////////////
 
   //If user is not logged in, redirect to login page
   useEffect(() => {
@@ -34,7 +60,7 @@ export default function DashboardPage() {
   // Load user's lists
   useEffect(() => {
     const loadLists = async () => {
-      if (!user) return;
+      if (!user) return; //wait for user to be set
 
       try {
         setListsLoading(true);
@@ -51,6 +77,33 @@ export default function DashboardPage() {
 
     loadLists();
   }, [user]);
+
+  // Load user's stats
+  useEffect(() => {
+    const loadStats = async () => {
+      if (!user) return; //wait for user to be set (Not having this was causing a bug)
+
+      try {
+        setStatsLoading(true);
+        setStatsError(null);
+        const data = await getUserStats(user.uid);
+        setStats(data);
+      } catch (err) {
+        console.error("Error loading stats:", err);
+        setStatsError("Failed to load your statistics. Please try again.");
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, [user]);
+
+  ////////////////////////////////////////////////
+  //                                            //
+  //             FUNCTIONS                      //
+  //                                            //
+  ////////////////////////////////////////////////
 
   const handleCreateList = async (e) => {
     e.preventDefault();
@@ -87,6 +140,12 @@ export default function DashboardPage() {
       setCreatingList(false);
     }
   };
+
+  ////////////////////////////////////////////////
+  //                                            //
+  //              PAGE RENDER                   //
+  //                                            //
+  ////////////////////////////////////////////////
 
   // If page is still loading auth state, show loading message
   if (loading) {
@@ -134,12 +193,114 @@ export default function DashboardPage() {
               <p className="text-xs uppercase tracking-wide text-slate-400">
                 Songs
               </p>
-              <p className="text-xl font-semibold opacity-60">--</p>
+              <p className="text-xl font-semibold">
+                {statsLoading
+                  ? "…"
+                  : stats.totalSongs.toString().padStart(2, "0")}
+              </p>
             </div>
           </div>
         </header>
 
         {/* Main content */}
+        {/* Top stats row */}
+        <h2 className="mb-5 text-xl md:text-4xl font-maven font-semibold text-white text-center">
+          Check out these sick <span className="text-[#FA8128]">Stats</span>!
+        </h2>
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Top artists */}
+          <div className="bg-black/50 rounded-2xl border border-white/10 p-5 shadow-lg shadow-[#FA8128]/10">
+            <h2 className="text-lg md:text-3xl font-maven font-semibold text-white mb-3">
+              Top <span className="text-[#FA8128]">Artists</span>
+            </h2>
+
+            {statsLoading && (
+              <p className="text-sm text-slate-400 animate-pulse">
+                Loading your stats...
+              </p>
+            )}
+
+            {statsError && (
+              <p className="text-sm text-red-400 bg-red-950/30 border border-red-500/30 px-3 py-2 rounded-lg">
+                {statsError}
+              </p>
+            )}
+
+            {!statsLoading && !statsError && stats.topArtists.length === 0 && (
+              <p className="text-sm text-slate-500">
+                Add a few songs to your lists to see your top artists here.
+              </p>
+            )}
+
+            {!statsLoading && stats.topArtists.length > 0 && (
+              <ul className="space-y-2">
+                {stats.topArtists.map((artist, index) => (
+                  <li
+                    key={artist.name}
+                    className="flex items-center justify-between rounded-lg bg-black/60 border border-white/10 px-3 py-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs w-6 h-6 flex items-center justify-center rounded-full bg-[#FA8128]/20 text-[#FA8128] font-semibold">
+                        {index + 1}
+                      </span>
+                      <span className="text-lg text-white">{artist.name}</span>
+                    </div>
+                    <span className="text-sm text-slate-300">
+                      {artist.count} {artist.count === 1 ? "song" : "songs"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Top albums */}
+          <div className="bg-black/50 rounded-2xl border border-white/10 p-5 shadow-lg shadow-[#FA8128]/10">
+            <h2 className="text-lg md:text-3xl font-maven font-semibold text-white mb-3">
+              Top <span className="text-[#FA8128]">Albums</span>
+            </h2>
+
+            {statsLoading && (
+              <p className="text-sm text-slate-400 animate-pulse">
+                Finding your favorite records...
+              </p>
+            )}
+
+            {statsError && (
+              <p className="text-sm text-red-400 bg-red-950/30 border border-red-500/30 px-3 py-2 rounded-lg">
+                {statsError}
+              </p>
+            )}
+
+            {!statsLoading && !statsError && stats.topAlbums.length === 0 && (
+              <p className="text-sm text-slate-500">
+                Add songs to your lists to see which albums you spin the most.
+              </p>
+            )}
+
+            {!statsLoading && stats.topAlbums.length > 0 && (
+              <ul className="space-y-2">
+                {stats.topAlbums.map((album, index) => (
+                  <li
+                    key={`${album.album}-${album.artist}`}
+                    className="flex items-center justify-between rounded-lg bg-black/60 border border-white/10 px-3 py-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-white line-clamp-1">
+                        {index + 1}. {album.album}
+                      </span>
+                      <span className="text-xs text-slate-400 line-clamp-1">
+                        {album.artist}
+                      </span>
+                    </div>
+                    <span className="text-sm text-slate-300">
+                      {album.count} {album.count === 1 ? "song" : "songs"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
         <div
           className={
             showCreate
@@ -148,7 +309,7 @@ export default function DashboardPage() {
           }>
           {/* LEFT COLUMN: Your lists */}
           <section className="bg-black/40 rounded-2xl border border-white/10 p-6 shadow-lg shadow-[#FA8128]/10">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 ">
               <h2 className="text-xl md:text-3xl font-maven font-semibold text-white">
                 Your Created <span className="text-[#FA8128]">Lists</span>
               </h2>
@@ -229,8 +390,10 @@ export default function DashboardPage() {
               </h2>
               <p className="text-sm text-slate-300 mb-4">
                 Organize your songs into personalized lists like{" "}
-                <span className="text-[#FA8128]">“Sea Chanties to Cure Scurvy”</span>,{" "}
-                <span className="text-[#FA8128]">“Metalcore 2025”</span>, or{" "}
+                <span className="text-[#FA8128]">
+                  “Sea Chanties to Cure Scurvy”
+                </span>
+                , <span className="text-[#FA8128]">“Metalcore 2025”</span>, or{" "}
                 <span className="text-[#FA8128]">“Best of Punk”</span>.
               </p>
 
