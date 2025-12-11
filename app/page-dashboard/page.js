@@ -9,7 +9,12 @@ import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 
 // Services
-import { getLists, createList } from "../services/list-service.js";
+import {
+  getLists,
+  createList,
+  updateList,
+  deleteList,
+} from "../services/list-service.js";
 import { getUserStats } from "../services/stats-service.js";
 
 export default function DashboardPage() {
@@ -43,6 +48,13 @@ export default function DashboardPage() {
 
   // Control showing/hiding create list panel
   const [showCreate, setShowCreate] = useState(false);
+
+  // Edit list modal states
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingList, setEditingList] = useState(null);
+  const [editListName, setEditListName] = useState("");
+  const [editListDescription, setEditListDescription] = useState("");
+  const [updatingList, setUpdatingList] = useState(false);
 
   ////////////////////////////////////////////////
   //                                            //
@@ -127,6 +139,7 @@ export default function DashboardPage() {
           id: listId,
           name: newListName.trim(),
           description: newListDescription.trim(),
+          slug: listId.slug,
           createdAt: { seconds: Date.now() / 1000 },
         },
       ]);
@@ -138,6 +151,80 @@ export default function DashboardPage() {
       setListsError("Failed to create list. Please try again.");
     } finally {
       setCreatingList(false);
+    }
+  };
+
+  //Function to open edit modal
+  const openEditModal = (list) => {
+    setEditingList(list);
+    setEditListName(list.name);
+    setEditListDescription(list.description || "");
+    setShowEditModal(true);
+  };
+
+  //Function to save edits to a list
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editListName.trim()) return;
+
+    try {
+      setUpdatingList(true);
+      setListsError(null);
+
+      await updateList(
+        user.uid,
+        editingList.id,
+        editListName.trim(),
+        editListDescription.trim()
+      );
+
+      //Update local lists state
+      setLists((prev) =>
+        prev.map((list) =>
+          list.id === editingList.id
+            ? {
+                ...list,
+                name: editListName.trim(),
+                description: editListDescription.trim(),
+              }
+            : list
+        )
+      );
+
+      setShowEditModal(false);
+      setEditingList(null);
+    } catch (err) {
+      console.error("Error updating list:", err);
+      setListsError("Failed to update list. Please try again.");
+    } finally {
+      setUpdatingList(false);
+    }
+  };
+
+  //Function to delete a list (with confirmation)
+  const handleDeleteList = async (list) => {
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${list.name}"? This action cannot be undone.`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setListsError(null);
+      await deleteList(user.uid, list.id);
+
+      //Update local lists state
+      setLists((prev) => prev.filter((l) => l.id !== list.id));
+
+      //refresh stats after deletion
+      try {
+        const data = await getUserStats(user.uid);
+        setStats(data);
+      } catch (err) {
+        console.error("Error loading stats:", err);
+      }
+    } catch (err) {
+      console.error("Error deleting list:", err);
+      setListsError("Failed to delete list. Please try again.");
     }
   };
 
@@ -349,10 +436,10 @@ export default function DashboardPage() {
                       : null;
 
                   return (
-                    <button
+                    <div
                       key={list.id}
                       onClick={() => router.push(`/page-lists/${list.slug}`)}
-                      className="relative overflow-hidden group w-full rounded-2xl bg-gradient-to-br from-[#FA8128]/25 via-black to-[#111827] border border-white/10 p-5 text-left shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-[#FA8128]/70 transition">
+                      className="relative overflow-hidden group w-full rounded-2xl bg-gradient-to-br from-[#FA8128]/25 via-black to-[#111827] border border-white/10 p-5 text-left shadow-md hover:shadow-2xl hover:-translate-y-1 hover:border-[#FA8128]/70 transition cursor-pointer">
                       {/* Vinyl-ish accent circle */}
                       <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full border border-[#FA8128]/40 bg-[#FA8128]/10 opacity-40 group-hover:rotate-12 group-hover:opacity-70 transition" />
 
@@ -369,13 +456,76 @@ export default function DashboardPage() {
                               {list.description}
                             </p>
                           )}
+                          {createdAt && (
+                            <p className="mt-1 text-[10px] text-slate-500">
+                              Created on{" "}
+                              {createdAt.toLocaleDateString(undefined, {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </p>
+                          )}
                         </div>
 
-                        <span className="px-2.5 py-1 rounded-full bg-black/60 border border-white/20 text-[10px] font-semibold text-slate-200 group-hover:bg-[#FA8128] group-hover:text-black group-hover:border-transparent transition">
-                          View
-                        </span>
+                        {/* Right side: View + icon buttons */}
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="px-2.5 py-1 rounded-full bg-black/60 border border-white/20 text-[10px] font-semibold text-slate-200 group-hover:bg-[#FA8128] group-hover:text-black group-hover:border-transparent transition">
+                            View
+                          </span>
+
+                          <div className="flex items-center gap-2">
+                            {/* Edit icon button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation(); // otherwise triggers navigation
+                                openEditModal(list);
+                              }}
+                              className="flex items-center justify-center h-8 w-8 rounded-full border border-white/30 bg-black/70 text-white hover:border-[#FA8128] hover:bg-[#FA8128]/20 transition">
+                              <svg
+                                className="w-4 h-4"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none">
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"
+                                />
+                              </svg>
+                            </button>
+
+                            {/* Delete icon button */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation(); // otherwise triggers navigation
+                                handleDeleteList(list);
+                              }}
+                              className="flex items-center justify-center h-8 w-8 rounded-full border border-red-500/40 bg-black/70 text-red-400 hover:bg-red-600/80 hover:border-red-400 transition">
+                              <svg
+                                className="w-4 h-4"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none">
+                                <path
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -440,6 +590,70 @@ export default function DashboardPage() {
             </section>
           )}
         </div>
+
+        {/* EDIT MODAL */}
+        {showEditModal && editingList && (
+          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70">
+            <div className="w-full max-w-md rounded-2xl bg-[#050509] border border-white/10 p-6 shadow-2xl shadow-black/60">
+              <h3 className="text-xl font-maven font-semibold text-white mb-4">
+                Edit list
+              </h3>
+
+              {listsError && (
+                <p className="mb-3 text-sm text-red-400 bg-red-950/40 border border-red-500/20 py-2 px-3 rounded-lg">
+                  {listsError}
+                </p>
+              )}
+
+              <form onSubmit={handleSaveEdit} className="space-y-4">
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-slate-200">
+                    List name
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 rounded-lg bg-black/70 border border-white/20 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FA8128]"
+                    value={editListName}
+                    onChange={(e) => setEditListName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-slate-200">
+                    Description{" "}
+                    <span className="text-slate-500">(optional)</span>
+                  </label>
+                  <textarea
+                    className="w-full px-3 py-2 rounded-lg bg-black/70 border border-white/20 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FA8128] resize-none"
+                    rows={3}
+                    value={editListDescription}
+                    onChange={(e) => setEditListDescription(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setEditingList(null);
+                    }}
+                    className="px-4 py-2 rounded-lg border border-white/20 text-sm text-slate-200 hover:bg-white/5 transition">
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={updatingList || !editListName.trim()}
+                    className="px-5 py-2 rounded-lg bg-[#FA8128] text-black text-sm font-semibold shadow-lg shadow-[#FA8128]/40 hover:bg-[#ff9b47] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                    {updatingList ? "Saving..." : "Save changes"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
