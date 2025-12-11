@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🎵 Tune Buddy
 
-## Getting Started
+Tune Buddy is a modern song-tracking web app built for the **CPRG 306 – Web Development II** course at SAIT.  
+Tune Buddy was developed with a simple goal in mind, providing users with a platform-independent way for users to organize and track their song collections
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌟 About the Project
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Music enthusiasts have a few pain points:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Forgetting songs they've been on recently 
+- Losing track of tracks unavailable on their chosen streaming platform  
+- Not having a central place to store songs/albums they physically own  
 
-## Learn More
+**Tune Buddy aims to solves that.**
 
-To learn more about Next.js, take a look at the following resources:
+The app allows users to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Build custom lists (e.g., *Metal Favorites*, *90s Hip-Hop*, *Songs I Found in 2025*)  
+- Search for tracks using the iTunes API  
+- Keep a personal music library that is **independent** of any streaming service  
+- View statistics about their music tastes, such as top artists and albums  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tune Buddy was designed with **real** pain points in mind, as per the empathy map.
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🚀 Features
+
+### 👤 User Profile
+- Custom avatar upload  
+- Custom username  
+- “About Me” bio section  
+
+### 🎶 Music Lists
+- Create as many lists as you want  
+- Add songs from the search system  
+- Organized UI for browsing and managing lists  
+
+### 🔍 Song Search
+- Search using the iTunes API for millions of songs  
+- Add results straight into your lists  
+- Listen to a preview of each song straight from the browser  
+
+### 📊 Personal Statistics
+- Top artists based on your added songs  
+- Top albums  
+- Total song count  
+- Automatically updated as you add/remove songs  
+
+
+
+## 🛠️ Technology Stack
+
+This is a **frontend-focused** project using modern web tools:
+
+| Category | Technology |
+|---------|------------|
+| Frontend | **Next.js** |
+| Styling | **TailwindCSS** |
+| Authentication | **Firebase Auth** |
+| Database | **Firestore** |
+| File Storage | ***Firebase Storage** |
+| External API | **iTunes Search API** |
+
+*Firebase Storage is used to store the users profile pics
+
+
+
+## 📚 Project Purpose
+
+This project aims to demonstrated the practical use of everything we have learned so far in the course, as well as things we had to do some additional learning on:
+
+- React & Next.js development
+- Dynamic Routing (Slug-based routing)
+- API integration  
+- Authentication flows  
+- Database design with Firestore  
+- Cloud file storage for avatars (buckets) 
+- Responsive UI with TailwindCSS  
+- State management using React hooks and context  
