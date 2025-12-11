@@ -126,23 +126,14 @@ export default function DashboardPage() {
       setCreatingList(true);
       setListsError(null);
 
-      const listId = await createList(
+      const created = await createList(
         user.uid,
         newListName.trim(),
         newListDescription.trim()
       );
 
       // Update local lists state to include the new list
-      setLists((prev) => [
-        ...prev,
-        {
-          id: listId,
-          name: newListName.trim(),
-          description: newListDescription.trim(),
-          slug: listId.slug,
-          createdAt: { seconds: Date.now() / 1000 },
-        },
-      ]);
+      setLists((prev) => [...prev, created]);
 
       setNewListName("");
       setNewListDescription("");
@@ -171,7 +162,7 @@ export default function DashboardPage() {
       setUpdatingList(true);
       setListsError(null);
 
-      await updateList(
+      const { slug } = await updateList( //updateList now returns the new slug
         user.uid,
         editingList.id,
         editListName.trim(),
@@ -186,6 +177,7 @@ export default function DashboardPage() {
                 ...list,
                 name: editListName.trim(),
                 description: editListDescription.trim(),
+                slug, // Update slug in local state
               }
             : list
         )

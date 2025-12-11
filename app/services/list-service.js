@@ -81,6 +81,8 @@ export async function updateList(userId, listId, name, description = "") {
   }
 
   await updateDoc(listRef, newData);
+
+  return {slug: newData.slug}; //used to sync with local state
 }
 
 ////////////////////////////////////////////
