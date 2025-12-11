@@ -24,6 +24,12 @@ export default function ListPage({ params }) {
   const router = useRouter();
   const { user, loading } = useUserAuth();
 
+  ////////////////////////////////////////////////
+  //                                            //
+  //              STATES                        //
+  //                                            //
+  ////////////////////////////////////////////////
+
   //States for list data
   const [list, setList] = useState(null);
   const [loadingList, setLoadingList] = useState(true);
@@ -47,6 +53,12 @@ export default function ListPage({ params }) {
   //States for the audio Preview
   const [currentPreviewId, setCurrentPreviewId] = useState(null);
   const audioRef = useRef(null);
+
+  ////////////////////////////////////////////////
+  //                                            //
+  //              USE EFFECTS                   //
+  //                                            //
+  ////////////////////////////////////////////////
 
   // Redirect if not logged in
   useEffect(() => {
@@ -100,29 +112,11 @@ export default function ListPage({ params }) {
     loadSongs();
   }, [user, list]);
 
-  // If loading, show a loading message
-  if (loading || loadingList) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
-        Loading list...
-      </div>
-    );
-  }
-
-  // If error occurred, show error message
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-black text-red-400">
-        {error}
-      </div>
-    );
-  }
-
-  ///////////////////////
-  //                   //
-  //HANDLING FUNCTIONS //
-  //                   //
-  ///////////////////////
+  ////////////////////////////////////////////////
+  //                                            //
+  //             FUNCTIONS                      //
+  //                                            //
+  ////////////////////////////////////////////////
 
   // Helper function to refresh songs
   const refreshSongs = async () => {
@@ -208,6 +202,30 @@ export default function ListPage({ params }) {
     audio.play();
     setCurrentPreviewId(song.id);
   };
+
+  ////////////////////////////////////////////////
+  //                                            //
+  //              PAGE RENDER                   //
+  //                                            //
+  ////////////////////////////////////////////////
+
+  // If loading, show a loading message
+  if (loading || loadingList) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black text-white">
+        Loading list...
+      </div>
+    );
+  }
+
+  // If error occurred, show error message
+  if (error) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black text-red-400">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-black via-[#050509] to-black">
