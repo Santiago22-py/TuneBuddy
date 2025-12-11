@@ -15,6 +15,7 @@ import {
   updateList,
   deleteList,
 } from "../services/list-service.js";
+import { getUserProfile } from "../services/profile-service";
 import { getUserStats } from "../services/stats-service.js";
 
 export default function DashboardPage() {
@@ -26,6 +27,9 @@ export default function DashboardPage() {
   //              STATES                        //
   //                                            //
   ////////////////////////////////////////////////
+
+  // Avatar state
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
   // List helper states
   const [lists, setLists] = useState([]);
@@ -111,6 +115,20 @@ export default function DashboardPage() {
     loadStats();
   }, [user]);
 
+  // Load user avatar preview
+  useEffect(() => {
+    const loadAvatarPreview = async () => {
+      if (!user) return;
+      try {
+        const profile = await getUserProfile(user.uid);
+        setAvatarPreview(profile.avatarUrl || null);
+      } catch (err) {
+        console.error("Error loading user profile for avatar:", err);
+      }
+    };
+    loadAvatarPreview();
+  }, [user]);
+
   ////////////////////////////////////////////////
   //                                            //
   //             FUNCTIONS                      //
@@ -162,7 +180,8 @@ export default function DashboardPage() {
       setUpdatingList(true);
       setListsError(null);
 
-      const { slug } = await updateList( //updateList now returns the new slug
+      const { slug } = await updateList(
+        //updateList now returns the new slug
         user.uid,
         editingList.id,
         editListName.trim(),
@@ -249,13 +268,29 @@ export default function DashboardPage() {
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-10">
         {/* Header area with stats vibe */}
         <header className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-maven font-bold text-white mb-2">
-              Welcome back, <span className="text-[#FA8128]">{username}</span>{" "}
-            </h1>
-            <p className="text-slate-300">
-              Manage your song lists and keep your collection organized.
-            </p>
+          <div className="flex items-center gap-6">
+            {/* Avatar */}
+            <div className="h-40 w-40 rounded-full overflow-hidden border-2 border-[#FA8128]/70 bg-gradient-to-br from-[#FA8128]/40 via-black to-black flex items-center justify-center text-3xl font-bold shadow-lg shadow-[#FA8128]/20">
+              {avatarPreview ? (
+                <img
+                  src={avatarPreview}
+                  alt="Avatar"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="uppercase">{username.charAt(0)}</span>
+              )}
+            </div>
+
+            {/* Text */}
+            <div>
+              <h1 className="text-3xl md:text-4xl font-maven font-bold text-white mb-1">
+                Welcome back, <span className="text-[#FA8128]">{username}</span>
+              </h1>
+              <p className="text-slate-300">
+                Manage your song lists and keep your collection organized.
+              </p>
+            </div>
           </div>
 
           {/* Quick stats */}

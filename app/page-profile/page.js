@@ -204,7 +204,9 @@ export default function ProfilePage() {
                         className="h-full w-full object-cover"
                       />
                     ) : (
-                      <span className="uppercase">{userDisplayName.charAt(0)}</span>
+                      <span className="uppercase">
+                        {userDisplayName.charAt(0)}
+                      </span>
                     )}
                   </div>
 
