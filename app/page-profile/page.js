@@ -64,11 +64,11 @@ export default function ProfilePage() {
         //Fetch profile from Firestore
         const profile = await getUserProfile(user.uid);
 
-        //if user has no profile, create a default one (This might happened because of profiles created before I added the profile service)
+        //if user has no displayName, create a default one (This might happened because of profiles created before I added the profile service)
         setDisplayName(
           profile.username && profile.username.trim().length > 0
-            ? profile.username
-            : user.displayName || ""
+            ? user.displayName
+            : profile.username || ""
         );
 
         setAboutMe(profile.aboutMe || "");
