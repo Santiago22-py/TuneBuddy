@@ -210,7 +210,7 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  {/* Hidden file input */}
+                  {/* Hidden file input  */}
                   <input 
                     id="avatar-upload"
                     type="file"
