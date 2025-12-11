@@ -12,28 +12,33 @@ export async function getUserStats(userId) {
   //get all lists for the user
   const lists = await getLists(userId);
 
-  //Initialize statistics variables
-  let totalSongs = 0;
-  const artistCount = {};
-  const albumCount = {};
+  const uniuqueSong = new Map(); //To avoid counting duplicate songs across lists
 
-  //Loop through each list to gather song data
-  for (const list of lists) {
-    const songs = await getAllSongs(userId, list.id);
-    totalSongs += songs.length;
+  // Get all unique songs from all lists
+    for (const list of lists) {
+        const songs = await getAllSongs(userId, list.id);
+        songs.forEach(song => {
+            uniuqueSong.set(song.id, song); //Using Map to ensure no duplicates
+        });
+    }
 
-    //get artist and album name
-    songs.forEach((song) => {
-      const artist = song.artist || "Unknown Artist"; //Handle missing artist names
-      const album = song.album || "Unknown Album"; //Handle missing album names
+    const totalSongs = uniuqueSong.size; //Total unique songs
 
-      //Count occurrences of each artist
-      artistCount[artist] = (artistCount[artist] || 0) + 1;
+  //Now gather top artists and albums
+  const artistCount = {}; //Object to hold artist counts
+  const albumCount = {}; //Object to hold album counts
 
-      //Count occurrences of each album
-      const albumKey = `${album} by ${artist}`; //To differentiate albums with same name by different artists
-      albumCount[albumKey] = (albumCount[albumKey] || 0) + 1;
-    });
+  //Get stats from unique songs
+  for (const song of uniuqueSong.values()) {
+    const artist = song.artist || "Unknown Artist";
+    const album = song.album || "Unknown Album";
+
+    //Count artists
+    artistCount[artist] = (artistCount[artist] || 0) + 1;
+
+    //Count albums (using album + artist as key to avoid collisions)
+    const albumKey = `${album} by ${artist}`;
+    albumCount[albumKey] = (albumCount[albumKey] || 0) + 1;
   }
 
   //Sort artists by count and get top 5
