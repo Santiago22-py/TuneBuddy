@@ -110,16 +110,16 @@ export default function Navbar() {
         {/* RIGHT SIDE NAV OPTIONS */}
         <ul className="flex items-center space-x-6 text-white font-medium">
           <li>
-            <Link
-              href="/page-dashboard"
-              className="hover:text-[#FA8128] transition">
-              Dashboard
+            <Link href="/" className="hover:text-[#FA8128] transition">
+              Home
             </Link>
           </li>
 
           <li>
-            <Link href="/" className="hover:text-[#FA8128] transition">
-              Home
+            <Link
+              href="/page-dashboard"
+              className="hover:text-[#FA8128] transition">
+              Dashboard
             </Link>
           </li>
 
