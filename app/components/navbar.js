@@ -101,6 +101,16 @@ export default function Navbar() {
           <li>
             <button
               onClick={async () => {
+                router.push("/page-profile");
+              }}
+              className="hover:text-[#FA8128] transition">
+              Profile
+            </button>
+          </li>
+
+          <li>
+            <button
+              onClick={async () => {
                 await firebaseSignOut();
                 router.push("/");
               }}
