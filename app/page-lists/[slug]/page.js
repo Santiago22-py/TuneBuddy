@@ -173,6 +173,11 @@ export default function ListPage({ params }) {
       console.error(err);
       setAddSongFeedback(`Failed to add "${song.title}" to the list.`);
     }
+
+    //Clear feedback after 3 seconds
+    setTimeout(() => {
+      setAddSongFeedback(null);
+    }, 3000);
   };
 
   //Function to handle removing a song from the list
